@@ -1,4 +1,4 @@
-module github.com/johejo/go-mysql-client
+module github.com/snowdusk/go-mysql-client
 
 go 1.13
 

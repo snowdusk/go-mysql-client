@@ -2,16 +2,22 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 
-	gomysqlclient "github.com/johejo/go-mysql-client"
+	gomysqlclient "github.com/snowdusk/go-mysql-client"
 )
 
 func main() {
 	var c gomysqlclient.Config
 	var fileName string
 
+	flag.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(), `Usage of %s:
+gomysql -P 3306 -h localhost -u user -p password database_name\n`, os.Args[0])
+		flag.PrintDefaults()
+	}
 	flag.StringVar(&c.Host, "h", "localhost", "host")
 	flag.UintVar(&c.Port, "P", 3306, "port")
 	flag.StringVar(&c.User, "u", "", "user")
