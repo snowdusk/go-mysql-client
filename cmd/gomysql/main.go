@@ -15,7 +15,8 @@ func main() {
 
 	flag.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(), `Usage of %s:
-gomysql -P 3306 -h localhost -u user -p password database_name\n`, os.Args[0])
+gomysql -P 3306 -h localhost -u user -p password database_name
+\n`, os.Args[0])
 		flag.PrintDefaults()
 	}
 	flag.StringVar(&c.Host, "h", "localhost", "host")
