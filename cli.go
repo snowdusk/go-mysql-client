@@ -196,14 +196,14 @@ func (r *Results) String() string {
 	if !r.Vertical {
 		table.SetHeader(r.Columns)
 		table.AppendBulk(r.Rows)
-		table.Render()
 	} else {
 		table.SetHeader([]string{"ROWS"})
 		table.SetRowLine(true)
 		table.SetAutoWrapText(false)
 		columnLen := len(r.Columns)
+		b := bytes.NewBufferString("")
 		for _, row := range r.Rows {
-			b := bytes.NewBufferString("")
+			b.Reset()
 			for i, col := range r.Columns {
 				if i < columnLen - 1 {
 					b.WriteString(fmt.Sprintf("%s:%s\n", col, row[i]))
@@ -213,7 +213,7 @@ func (r *Results) String() string {
 			}
 			table.Append([]string{b.String()})
 		}
-		table.Render()
 	}
+	table.Render()
 	return buf.String()
 }
