@@ -99,6 +99,11 @@ func (c *Cli) executor(in string) {
 		os.Exit(0)
 	default:
 		q := in
+		var vertical bool
+		if strings.HasSuffix(q, `\G`) {
+			vertical = true
+			q = strings.TrimSuffix(q, `\G`)
+		}
 		if _, err := sqlparser.Parse(q); err != nil {
 			fmt.Println(err)
 			return
@@ -108,6 +113,7 @@ func (c *Cli) executor(in string) {
 			fmt.Println(err)
 			return
 		}
+		results.Vertical = vertical
 		fmt.Println(results.String())
 		return
 	}
@@ -179,15 +185,35 @@ func QueriesFromReader(r io.Reader) []string {
 }
 
 type Results struct {
-	Columns []string
-	Rows    [][]string
+	Vertical bool // 默认横表，为true表示竖表
+	Columns  []string
+	Rows     [][]string
 }
 
 func (r *Results) String() string {
 	buf := bytes.NewBufferString("")
 	table := tablewriter.NewWriter(buf)
-	table.SetHeader(r.Columns)
-	table.AppendBulk(r.Rows)
-	table.Render()
+	if !r.Vertical {
+		table.SetHeader(r.Columns)
+		table.AppendBulk(r.Rows)
+		table.Render()
+	} else {
+		table.SetHeader([]string{"ROWS"})
+		table.SetRowLine(true)
+		table.SetAutoWrapText(false)
+		columnLen := len(r.Columns)
+		for _, row := range r.Rows {
+			b := bytes.NewBufferString("")
+			for i, col := range r.Columns {
+				if i < columnLen - 1 {
+					b.WriteString(fmt.Sprintf("%s:%s\n", col, row[i]))
+				} else {
+					b.WriteString(fmt.Sprintf("%s:%s", col, row[i]))
+				}
+			}
+			table.Append([]string{b.String()})
+		}
+		table.Render()
+	}
 	return buf.String()
 }
